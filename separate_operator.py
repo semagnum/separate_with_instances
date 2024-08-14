@@ -3,7 +3,7 @@ import bpy
 
 class MESH_OT_Separate_With_Instances(bpy.types.Operator):
     bl_idname = 'mesh.separate_with_instances'
-    bl_label = 'Separate'
+    bl_label = 'Separate with Instances'
     bl_description = 'Separates geometry and re-adding them to other instances'
     bl_options = {'REGISTER', 'UNDO'}
 
