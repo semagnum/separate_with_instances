@@ -63,6 +63,41 @@ def test_sanity():
     assert 1 + 1 == 2
 
 
+def test_separate_parents(context, ops):
+    # clear scene
+    ops.object.select_all(action='SELECT')
+    ops.object.delete(use_global=False, confirm=False)
+
+    ops.mesh.primitive_cube_add()
+    ops.mesh.primitive_monkey_add()
+    ops.transform.translate(value=(0, 0, -5))
+
+    # set parent
+    context.scene.objects['Cube'].select_set(True)
+    context.scene.objects['Suzanne'].select_set(True)
+    context.view_layer.objects.active = context.scene.objects['Cube']
+    ops.object.parent_set(type='OBJECT', keep_transform=False)
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (-4.3952, -5.05493, 0)})
+
+    ops.object.select_all(action='DESELECT')
+    context.scene.objects['Cube'].select_set(False)
+    context.scene.objects['Suzanne'].select_set(True)
+    context.view_layer.objects.active = context.scene.objects['Suzanne']
+    ops.object.editmode_toggle()
+    ops.mesh.select_all(action='SELECT')
+    ops.mesh.separate_with_instances(type='LOOSE')
+
+    # (3 pieces) * 2 + 2 cubes == 8 meshes
+    assert len(context.scene.objects) == 8
+
+    # 4 (3 pieces + 1 cube) datablocks used
+    assert len({obj.data for obj in context.scene.objects}) == 4
+
+    # 4 matrices used (2 parents, 3 children per parent that share same location)
+    assert len({str(obj.matrix_world.to_translation()) for obj in context.scene.objects}) == 4
+
+
 def test_separate_instance_loose_parts(context, ops):
     # clear scene
     ops.object.select_all(action='SELECT')

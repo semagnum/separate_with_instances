@@ -48,6 +48,7 @@ class MESH_OT_Separate_With_Instances(bpy.types.Operator):
         for new_obj in new_objs:
             for linked_scene_object in linked_objects:
                 # get linked scene object matrix, and instance new_obj to its location
+                new_parent = linked_scene_object.parent
                 new_matrix = linked_scene_object.matrix_world.copy()
 
                 bpy.ops.object.editmode_toggle()
@@ -56,6 +57,7 @@ class MESH_OT_Separate_With_Instances(bpy.types.Operator):
                     bpy.ops.object.duplicate(linked=True)
 
                 bpy.ops.object.editmode_toggle()
+                new_obj.parent = new_parent
                 new_obj.matrix_world = new_matrix
                 new_obj.select_set(True)
 
