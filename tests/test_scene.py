@@ -66,16 +66,16 @@ def test_sanity():
 def test_separate_instance_loose_parts(context, ops):
     # clear scene
     ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete(use_global=False, confirm=False)
+    ops.object.delete(use_global=False, confirm=False)
 
     ops.mesh.primitive_monkey_add()
 
     # instance Suzanne a couple of times
-    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
-                                         TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
-                                                                 "orient_type": 'GLOBAL',
-                                                                 "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
-                                                                 "orient_matrix_type": 'GLOBAL'})
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
+                                                             "orient_type": 'GLOBAL',
+                                                             "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+                                                             "orient_matrix_type": 'GLOBAL'})
     bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
                                          TRANSFORM_OT_translate={"value": (5.13482, 12.2365, 0),
                                                                  "orient_type": 'GLOBAL',
@@ -100,26 +100,25 @@ def test_separate_instance_loose_parts(context, ops):
 def test_separate_instance_selected(context, ops):
     # clear scene
     ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete(use_global=False, confirm=False)
+    ops.object.delete(use_global=False, confirm=False)
 
     ops.mesh.primitive_cube_add()
 
-
     # instance a couple of times
-    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
-                                         TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
-                                                                 "orient_type": 'GLOBAL',
-                                                                 "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
-                                                                 "orient_matrix_type": 'GLOBAL'})
-    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
-                                         TRANSFORM_OT_translate={"value": (5.13482, 12.2365, 0),
-                                                                 "orient_type": 'GLOBAL',
-                                                                 "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
-                                                                 "orient_matrix_type": 'GLOBAL'})
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
+                                                             "orient_type": 'GLOBAL',
+                                                             "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+                                                             "orient_matrix_type": 'GLOBAL'})
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (5.13482, 12.2365, 0),
+                                                             "orient_type": 'GLOBAL',
+                                                             "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+                                                             "orient_matrix_type": 'GLOBAL'})
 
     ops.object.editmode_toggle()
     # only select some of the faces
-    bpy.ops.mesh.select_random(ratio=0.25, seed=1)
+    ops.mesh.select_random(ratio=0.25, seed=1)
     ops.mesh.separate_with_instances(type='SELECTED')
 
     # (two pieces) * 3 == 6 meshes
@@ -150,16 +149,16 @@ def test_separate_instance_material(context, ops):
     context.object.data.polygons[3].material_index = 1
 
     # instance a couple of times
-    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
-                                         TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
-                                                                 "orient_type": 'GLOBAL',
-                                                                 "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
-                                                                 "orient_matrix_type": 'GLOBAL'})
-    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
-                                         TRANSFORM_OT_translate={"value": (5.13482, 12.2365, 0),
-                                                                 "orient_type": 'GLOBAL',
-                                                                 "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
-                                                                 "orient_matrix_type": 'GLOBAL'})
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (-2.97763, -5.86426, 0),
+                                                             "orient_type": 'GLOBAL',
+                                                             "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+                                                             "orient_matrix_type": 'GLOBAL'})
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (5.13482, 12.2365, 0),
+                                                             "orient_type": 'GLOBAL',
+                                                             "orient_matrix": ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+                                                             "orient_matrix_type": 'GLOBAL'})
 
     ops.object.editmode_toggle()
     ops.mesh.select_all(action='SELECT')
