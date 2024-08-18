@@ -1,3 +1,4 @@
+import ast
 import os
 from pathlib import Path
 import pytest
@@ -208,3 +209,75 @@ def test_separate_instance_material(context, ops):
     # only 3 matrices used
     assert len({str(obj.location) for obj in context.scene.objects}) == 3
 
+
+def test_set_origin_shifted(context, ops):
+    # clear scene
+    ops.object.select_all(action='SELECT')
+    ops.object.delete(use_global=False, confirm=False)
+
+    ops.mesh.primitive_monkey_add()
+
+    # instance Suzanne a couple of times
+    DISTANCE = 5
+    ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                     TRANSFORM_OT_translate={"value": (-DISTANCE, 0, 0)})
+    bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
+                                         TRANSFORM_OT_translate={"value": (DISTANCE * 2, 0, 0)})
+
+    ops.object.origin_set_with_instances()
+
+    objects = context.scene.objects
+    # only 3 datablocks used
+    assert len({obj.data for obj in objects}) == 1
+    # 3 distinct matrices
+    assert len({str(obj.location) for obj in objects}) == 3
+    # origins align
+    loc0, loc1, loc2 = objects['Suzanne'].location, objects['Suzanne.001'].location, objects['Suzanne.002'].location
+    assert loc0[0] == (loc1[0] + DISTANCE) == (loc2[0] - DISTANCE)
+    assert loc0[1] == loc1[1] == loc2[1]
+    assert loc0[2] == loc1[2] == loc2[2]
+
+
+# UTILITY TESTS/FUNCTIONS
+
+
+def get_init_version(filepath):
+    with open(filepath, 'r') as f:
+        node = ast.parse(f.read())
+
+    n: ast.Module
+    for n in ast.walk(node):
+        for b in n.body:
+            if isinstance(b, ast.Assign) and isinstance(b.value, ast.Dict) and (
+                    any(t.id == 'bl_info' for t in b.targets)):
+                bl_info_dict = ast.literal_eval(b.value)
+                return bl_info_dict['version']
+
+    raise AssertionError(filepath + ' has no version')
+
+
+def get_extension_version(filepath):
+    with open(filepath, 'r') as f:
+        node = ast.parse(f.read())
+
+    n: ast.Module
+    for n in ast.walk(node):
+        for b in n.body:
+            if (isinstance(b, ast.Assign) and
+                    isinstance(b.value, ast.Str) and
+                    any(t.id == 'version' for t in b.targets)
+            ):
+                return tuple(map(int, str(ast.literal_eval(b.value)).split('.')))
+
+    raise AssertionError(filepath + ' has no version')
+
+
+def test_assert_version_parity_manifest():
+    import ast
+
+    root_folder = Path(__file__).parent.parent
+    init = root_folder / '__init__.py'
+    extension_manifest = root_folder / 'blender_manifest.toml'
+
+    init_version, extension_version = get_init_version(init), get_extension_version(extension_manifest)
+    assert init_version == extension_version

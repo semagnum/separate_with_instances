@@ -20,12 +20,12 @@ if 'bpy' in locals():  # already reloaded
 
 import bpy
 
-from .separate_operator import MESH_OT_Separate_With_Instances
+from .separate_operator import SeparateOperator, SetOriginOperator
 
 bl_info = {
     'name': 'Separate with Instances',
     'author': 'Spencer Magnusson',
-    'version': (0, 0, 2),
+    'version': (0, 0, 3),
     'blender': (3, 6, 0),
     'description': '',
     'location': '',
@@ -35,13 +35,21 @@ bl_info = {
     'tracker_url': '',
 }
 
-classes_to_register = (MESH_OT_Separate_With_Instances,)
+classes_to_register = (SeparateOperator, SetOriginOperator,)
 addon_keymaps = []
+
+
+def draw_menu(self, context):
+    layout = self.layout
+    layout.operator_menu_enum('object.origin_set_with_instances', text='Set Origin + Instances', property='type')
+
 
 def register():
     """Registers operators."""
     for cls in classes_to_register:
         bpy.utils.register_class(cls)
+
+    bpy.types.VIEW3D_MT_object.append(draw_menu)
 
     wm = bpy.context.window_manager
     if wm.keyconfigs.addon:
@@ -56,6 +64,8 @@ def unregister():
     if kc:
         for km, kmi in addon_keymaps:
             km.keymap_items.remove(kmi)
+
+    bpy.types.VIEW3D_MT_object.remove(draw_menu)
 
     for cls in classes_to_register:
         bpy.utils.unregister_class(cls)

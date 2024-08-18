@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "separate_with_instances"
-version = "0.0.2"
+version = "0.0.3"
 name = "Separate with Instances"
 tagline = "Separate objects and re-place instanced meshes"
 maintainer = "Spencer Magnusson <semagnum+blenderextensions@gmail.com>"
