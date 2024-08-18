@@ -31,8 +31,8 @@ bl_info = {
     'location': '',
     'support': 'COMMUNITY',
     'category': 'Mesh',
-    'doc_url': '',
-    'tracker_url': '',
+    'doc_url': 'https://github.com/semagnum/separate_with_instances',
+    'tracker_url': 'https://github.com/semagnum/separate_with_instances/issues',
 }
 
 classes_to_register = (SeparateOperator, SetOriginOperator,)
