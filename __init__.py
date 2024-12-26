@@ -25,7 +25,7 @@ from .separate_operator import SeparateOperator, SetOriginOperator
 bl_info = {
     'name': 'Separate with Instances',
     'author': 'Spencer Magnusson',
-    'version': (0, 0, 3),
+    'version': (0, 1, 0),
     'blender': (3, 6, 0),
     'description': '',
     'location': '',
@@ -36,12 +36,16 @@ bl_info = {
 }
 
 classes_to_register = (SeparateOperator, SetOriginOperator,)
-addon_keymaps = []
 
 
 def draw_menu(self, context):
     layout = self.layout
-    layout.operator_menu_enum('object.origin_set_with_instances', text='Set Origin + Instances', property='type')
+    layout.operator_menu_enum(SetOriginOperator.bl_idname, property='type')
+
+
+def draw_mesh_menu(self, context):
+    layout = self.layout
+    layout.operator_menu_enum(SeparateOperator.bl_idname, property='type')
 
 
 def register():
@@ -50,22 +54,12 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.types.VIEW3D_MT_object.append(draw_menu)
-
-    wm = bpy.context.window_manager
-    if wm.keyconfigs.addon:
-        km = wm.keyconfigs.addon.keymaps.new(name='Mesh', space_type='EMPTY')
-        kmi = km.keymap_items.new('mesh.separate_with_instances', 'P', 'PRESS')
-        addon_keymaps.append((km, kmi))
+    bpy.types.VIEW3D_MT_edit_mesh.append(draw_mesh_menu)
 
 
 def unregister():
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs.addon
-    if kc:
-        for km, kmi in addon_keymaps:
-            km.keymap_items.remove(kmi)
-
     bpy.types.VIEW3D_MT_object.remove(draw_menu)
+    bpy.types.VIEW3D_MT_edit_mesh.remove(draw_mesh_menu)
 
     for cls in classes_to_register:
         bpy.utils.unregister_class(cls)
