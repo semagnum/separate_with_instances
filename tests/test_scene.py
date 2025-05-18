@@ -13,13 +13,15 @@ def get_zip_file_in_parent_dir():
     Since this will be in the tests/ folder,
     we need to go up a folder to find the zip file that compress.py builds.
     """
-    parent_dir = Path(os.getcwd()).parent
-    for root, dirs, files in os.walk(parent_dir):
-        for file in files:
-            if file.endswith(".zip"):
-                return os.path.join(root, file)
-
-    raise FileNotFoundError('No zip file to install into Blender!')
+    parent_dir = Path(__file__).parent.parent
+    try:
+        return next(
+            os.path.join(parent_dir, f)
+            for f in os.listdir(parent_dir)
+            if f.endswith('.zip')
+        )
+    except StopIteration:
+        raise FileNotFoundError('No zip file to install into Blender!')
 
 
 @pytest.fixture(scope="session", autouse=True)
