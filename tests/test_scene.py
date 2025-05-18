@@ -61,6 +61,16 @@ def ops():
     return bpy.ops
 
 
+@pytest.fixture(params=['GEOMETRY_ORIGIN', 'ORIGIN_GEOMETRY', 'ORIGIN_CURSOR', 'ORIGIN_CENTER_OF_MASS', 'ORIGIN_CENTER_OF_VOLUME'])
+def origin_type(request):
+    return request.param
+
+
+@pytest.fixture(params=['MEDIAN', 'BOUNDS'])
+def center(request):
+    return request.param
+
+
 def test_sanity():
     """If this fails, you are probably not setup, period ;P."""
     assert 1 + 1 == 2
@@ -212,7 +222,7 @@ def test_separate_instance_material(context, ops):
     assert len({str(obj.location) for obj in context.scene.objects}) == 3
 
 
-def test_set_origin_shifted(context, ops):
+def test_set_origin_shifted(context, ops, origin_type, center):
     # clear scene
     ops.object.select_all(action='SELECT')
     ops.object.delete(use_global=False, confirm=False)
@@ -226,7 +236,7 @@ def test_set_origin_shifted(context, ops):
     bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
                                          TRANSFORM_OT_translate={"value": (DISTANCE * 2, 0, 0)})
 
-    ops.object.origin_set_with_instances()
+    ops.object.origin_set_with_instances(type=origin_type, center=center)
 
     objects = context.scene.objects
     # only 3 datablocks used
