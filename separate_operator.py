@@ -96,6 +96,7 @@ class SetOriginOperator(bpy.types.Operator):
 
     def execute(self, context):
         prev_cursor_location = context.scene.cursor.location.copy()
+        prev_active_object = context.view_layer.objects.active
         selection = context.selected_objects[:]
         selection_to_other_instances = {
             obj: [
@@ -134,6 +135,7 @@ class SetOriginOperator(bpy.types.Operator):
         bpy.ops.object.select_all(action='DESELECT')
         for obj in selection:
             obj.select_set(True)
+        context.view_layer.objects.active = prev_active_object
         context.scene.cursor.location = prev_cursor_location
 
         return {'FINISHED'}
