@@ -113,23 +113,25 @@ class SetOriginOperator(bpy.types.Operator):
                 obj.select_set(True)
             context.view_layer.objects.active = selected_objects[0]
 
+        meshes_to_delete_after = []
         for initial_obj in selection:
             linked_objects = selection_to_other_instances[initial_obj]
 
-            prev_location = initial_obj.location.copy()
+            prev_matrix = initial_obj.matrix_world.copy()
             obj_data_name = initial_obj.data.name
             force_selection([initial_obj])
             bpy.ops.object.make_single_user(object=False, obdata=True, material=False, animation=False)
             bpy.ops.object.origin_set(type=self.type, center=self.center)
-            initial_obj.data.name = obj_data_name
+            initial_obj.data.rename(obj_data_name, mode='ALWAYS')
 
-            location_diff = initial_obj.location - prev_location
-
+            rel_cursor_location = prev_matrix.inverted() @ context.scene.cursor.location
             for obj in linked_objects:
                 force_selection([obj])
                 bpy.ops.object.make_single_user(object=False, obdata=True, material=False, animation=False)
-                context.scene.cursor.location = obj.location + location_diff
-                bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+
+                meshes_to_delete_after.append(obj.data)
+                context.scene.cursor.location = obj.matrix_world @ rel_cursor_location
+                bpy.ops.object.origin_set(type=self.type, center=self.center)
                 obj.data = initial_obj.data
 
         bpy.ops.object.select_all(action='DESELECT')
@@ -137,5 +139,9 @@ class SetOriginOperator(bpy.types.Operator):
             obj.select_set(True)
         context.view_layer.objects.active = prev_active_object
         context.scene.cursor.location = prev_cursor_location
+
+        for mesh in meshes_to_delete_after:
+            assert mesh.users == 0
+            bpy.data.meshes.remove(mesh)
 
         return {'FINISHED'}

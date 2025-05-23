@@ -25,7 +25,7 @@ from .separate_operator import SeparateOperator, SetOriginOperator
 bl_info = {
     'name': 'Separate with Instances',
     'author': 'Spencer Magnusson',
-    'version': (0, 1, 1),
+    'version': (0, 1, 2),
     'blender': (3, 6, 0),
     'description': '',
     'location': '',

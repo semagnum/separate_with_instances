@@ -1,10 +1,15 @@
 import ast
+import math
 import os
 from pathlib import Path
 import pytest
 
 import bpy
 import addon_utils
+
+
+def test_math_isclose(a, b):
+    return math.isclose(a, b, rel_tol=1e-4, abs_tol=1e-4)
 
 
 def get_zip_file_in_parent_dir():
@@ -230,7 +235,7 @@ def test_set_origin_shifted(context, ops, origin_type, center):
     ops.mesh.primitive_monkey_add()
 
     # instance Suzanne a couple of times
-    DISTANCE = 5
+    DISTANCE = 5.0
     ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
                                      TRANSFORM_OT_translate={"value": (-DISTANCE, 0, 0)})
     bpy.ops.object.duplicate_move_linked(OBJECT_OT_duplicate={"linked": True, "mode": 'TRANSLATION'},
@@ -245,9 +250,9 @@ def test_set_origin_shifted(context, ops, origin_type, center):
     assert len({str(obj.location) for obj in objects}) == 3
     # origins align
     loc0, loc1, loc2 = objects['Suzanne'].location, objects['Suzanne.001'].location, objects['Suzanne.002'].location
-    assert loc0[0] == (loc1[0] + DISTANCE) == (loc2[0] - DISTANCE)
-    assert loc0[1] == loc1[1] == loc2[1]
-    assert loc0[2] == loc1[2] == loc2[2]
+    assert test_math_isclose(loc0[0], loc1[0] + DISTANCE) and test_math_isclose(loc0[0], loc2[0] - DISTANCE)
+    assert test_math_isclose(loc0[1], loc1[1]) and test_math_isclose(loc1[1], loc2[1])
+    assert test_math_isclose(loc0[2], loc1[2]) and test_math_isclose(loc1[2], loc2[2])
 
 
 # UTILITY TESTS/FUNCTIONS
